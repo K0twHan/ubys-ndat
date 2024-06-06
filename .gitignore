@@ -3,6 +3,12 @@
 /node_modules
 /build
 DockerFile
+
+# constants
+.env
+auth/constants
+/utils/constants
+
 # Logs
 logs
 *.log

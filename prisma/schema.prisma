@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,8 +7,100 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
+model Students {
+  id        Int         @id @default(autoincrement())
+  ad        String
+  soyad     String
+  tc        String    @db.Char(11) @unique
+  parola    String
+  gano      Decimal
+  akts      Int
+  bolum     String
+  donem     Int
+  //ders      Lectures[] 
+  rol       Role        @default(USER)
+  ogrenci_ders StudentLecture[]
+  Notes     Notes[]
+}
+
+model Lectures {
+  id        Int         @id @default(autoincrement())
+  ad        String
+  kredi     Int
+  akts      Int
+  donem     Int
+  bolum     String
+  saat      Int
+ // ogrenci   Students[] 
+  ogrenci_ders StudentLecture[]
+  lecturerId  Int  @default(0)
+  lecturer Lecturer @relation(fields:[lecturerId], references:[id])
+  Notes     Notes[]
+}
+
+model StudentLecture {
+  studentId Int         // Öğrenci ID'si
+  lectureId Int         // Ders ID'si
+  isEnable  Boolean @default(false)
+
+  @@id([studentId, lectureId])
+
+  student   Students    @relation(fields: [studentId], references: [id])
+  lecture   Lectures    @relation(fields: [lectureId], references: [id])
+}
+
+
+
+
+model Notes {
+  studentId Int
+  courseId  Int
+  not1      Decimal
+  not2      Decimal
+  proje     Decimal?
+  harfNotu  String
+  
+  student   Students    @relation(fields: [studentId], references: [id])
+  course    Lectures    @relation(fields: [courseId], references: [id])
+
+  @@id([studentId, courseId])
+}
+model Manager {
+  id        Int         @id @default(autoincrement())
+  ad        String
+  soyad     String
+  tc        String  @db.Char(11) @unique
+  parola    String
+
+  rol       Role        @default(MANAGER)
+}
+model Lecturer {
+   id        Int         @id @default(autoincrement())
+  ad        String
+  soyad     String
+  tc        String        @db.Char(11) @unique
+  parola    String
+  dersSaati Int
+  lectures Lectures[]
+  
+
+
+  rol       Role        @default(LECTURER)
+}
+
+model Advisor{
+    id        Int         @id @default(autoincrement())
+  ad        String
+  soyad     String
+  tc        String      @db.Char(11) @unique
+  parola    String
+
+  rol Role @default(ADVISOR)
+}
+
+enum Role {
+  USER
+  LECTURER
+  ADVISOR
+  MANAGER
 }
